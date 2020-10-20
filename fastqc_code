@@ -1,0 +1,68 @@
+#!/usr/bin/bash
+#copy the data and use the fastqc to analysis
+cp /localdisk/data/BPSM/Assignment1/fastq   ~/Assignment1
+mkdir fastqcresult
+for file in  ~/Assignment1/fastq/*.fq.gz
+do
+fastqc -o ./fastqcresult $file
+done
+#unzip the result
+mkdir fastqcresultunzip
+for file in ~/Assignment1/fastqcresult/*_fastqc.zip
+do
+unzip $file -d  ./fastqcresultunzip
+done
+
+#asses based on the output
+for file2 in ~/Assignment1/fastqcresultunzip/*_fastqc
+do
+grep -E "Filename|Total Sequences|Sequences flagged as poor quality|Sequence length|%GC" $file2/fastqc_data.txt  >>assesment.txt
+awk 'BEGIN{FS="\t";}
+{
+if($1 =="WARN")
+{
+print $0;
+if($2 == "Per base sequence quality")
+{print "Any base quality is below 10 or the median is less than 25,"}
+if($2 == "Per sequence quality scores")
+{print "Peak value is less than 27,error_rate 0.2%.Some of the sequencing data is of poor quality"}
+if($2 == "Per base sequence content")
+{print "The difference between A/T ratio and G/C ratio at any position is more than 10%"}
+if($2 == "Per sequence GC content")
+{print "The GC content at any position deviates from the mean by 5%"}
+if($2 == "Per base N content")
+{print "The rate of unrecognizable bases in each position of all reads exceeds 5%"}
+if($2 == "Sequence Length Distribution")
+{print "Inconsistent reads length"}
+if($2 == "Sequence Duplication Levels")
+{print "Non-unique reads account for more than 20% of the total"}
+if($2 == "Overrepresented sequences")
+{print "over-represented reads exceed the total by 0.1%"}
+if($2 == "Adapter Content")
+{print "pay _attention_to the adapter sequence"}
+}
+if($1 =="FAIL"){
+print $0;
+if($2 == "Per base sequence quality")
+{print "Any base quality is below 5 or the median is less than 20"}
+if($2 == "Per sequence quality scores")
+{print "Peak value is less than 20,error_rate 0.1%.Some of the sequencing data is of poor quality"}
+if($2 == "Per base sequence content")
+{print "The difference between A/T ratio and G/C ratio at any position is more than 20%"}
+if($2 == "Per sequence GC content")
+{print "The GC content at any position deviates from the mean by 10%"}
+if($2 == "Per base N content")
+{print "The rate of unrecognizable bases in each position of all reads exceeds 20%"}
+if($2 == "Sequence Length Distribution")
+{print "length=0"}
+if($2 == "Sequence Duplication Levels")
+{print "Non-unique reads account for more than 50% of the total"}
+if($2 == "Overrepresented sequences")
+{print "over-represented reads exceed the total by 1%"}
+if($2 == "Adapter Content")
+{print "pay _attention_to the adapter sequence"}
+}
+}' $file2/summary.txt >>assesment.txt
+echo -e "\n" >>assesment.txt
+done
+
