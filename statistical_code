@@ -1,0 +1,35 @@
+#!/usr/bin/bash
+#put the output file into the two differernt group,slender and stumpy,and there are both 3 files in the two groups
+slender=(216 218 219)
+stumpy=(220 221 222)
+c=3
+#extract the slender data from the output and calculate the average of the slender
+for slender in ${slender[*]}
+do
+a=($(awk '{print $7;}' ~/Assignment1/fastq/"${slender}".out));
+for((i=0;i<${#a[*]};i++))
+do
+let totalslender[i]+=${a[i]};
+let average1[i]=totalslender[i]/c;
+done
+done
+#extract the stumpy data from the output and calculate the average of the stumpy
+for stumpy in ${stumpy[*]}
+do
+a2=($(awk '{print $7;}' ~/Assignment1/fastq/"${stumpy}".out));
+for((i=0;i<${#a2[*]};i++))
+do
+let totalstumpy[i]+=${a2[i]};
+let average2[i]=totalstumpy[i]/c;
+done
+done
+
+#extract the genename from the file, and write the genename,average into the statistica.txt.
+
+genename=($(awk '{print $4;}' ~/Assignment1/fastq/"${stumpy}".out)); 
+echo -e "genename\tslendermean\tstumpymean\t">statistica.txt
+for((i=0;i<${#genename[*]};i++))
+do
+echo -e "${genename[i]}\t${average1[i]}\t${average2[i]}\t" >>statistica.txt
+done
+
