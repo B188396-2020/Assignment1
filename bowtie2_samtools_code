@@ -1,0 +1,23 @@
+#!/usr/bin/bash
+#get the data and unzip it in the directory
+mkdir bowtie2
+cp  /localdisk/data/BPSM/Assignment1/Tbb_genome/Tb927_genome.fasta.gz  ~/Assignment1/bowtie2
+gunzip  ~/Assignment1/bowtie2/Tb927_genome.fasta.gz
+#build the database
+bowtie2-build ~/Assignment1/bowtie2/Tb927_genome.fasta genomefa
+# align the read pairs with bowtie2, convert the output to indexed"bam"with samtools
+for filegz1 in ~/Assignment1/fastq/*1.fq.gz
+do
+filename1=${filegz1%_*}
+for filegz2 in ~/Assignment1/fastq/*2.fq.gz
+do
+filename2=${filegz2%_*}
+if (filename1==filename2)
+then
+bowtie2 -p 10 -x genomefa -1 $filegz1 -2 $filegz2 | samtools sort  > "$filename1".sort.bam
+samtools index   "$filename1".sort.bam
+fi
+done
+done
+
+
