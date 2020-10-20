@@ -1,0 +1,7 @@
+#!/usr/bin/bash
+#use the bedtools and bedfile,generate the data
+for data in ~/Assignment1/fastq/*.bam
+do 
+filename=${data%_*}
+bedtools multicov -bams $data -bed  /localdisk/data/BPSM/Assignment1/Tbbgenes.bed  > "$filename".out
+done
